@@ -90,11 +90,10 @@ db.collection("products").get().then(snapshot => {
       </div>
     `;
   });
-}).catch(error => {
+}).catch(error => { console.error("Firebase Error:", error);
   document.getElementById("products").innerText =
-    "প্যাকেজ লোড হয়নি। Firebase সেটিংস পরীক্ষা করো।";
+    "Firebase Error: " + error.code + " - " + error.message;
 });
-
 function selectPackage(id) {
   const uid = document.getElementById("uid").value.trim();
   if (!uid) {
