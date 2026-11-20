@@ -50,7 +50,7 @@ async function loadProducts(){
 
     const db=firebase.firestore();
     const snapshot=await db.collection("products").get();
-
+area.textContent="Firestore থেকে ডেটা পাওয়া গেছে!";
     area.innerHTML="";
 
     if(snapshot.empty){
