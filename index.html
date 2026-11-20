@@ -51,7 +51,7 @@ async function loadProducts(){
     const db=firebase.firestore();
     area.textContent="Firebase চালু হয়েছে!";
     const snapshot = await Promise.race([
-  db.collection("products").get({source:"server"}),
+  db.collection("products").get(),
   new Promise((_, reject) =>
     setTimeout(() => reject(new Error("Firestore Timeout")), 15000)
   )
