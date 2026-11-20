@@ -52,10 +52,7 @@ input {
 <header>ZRX TOPUP</header>
 <div class="container">
 <h2>Free Fire Diamond Store</h2>
-<p>তোমার পছন্দের Diamond Package বেছে নাও</p>
-<input id="uid" placeholder="Free Fire Player UID">
-<h3>Diamond Packages</h3>
-<div id="products">প্যাকেজ লোড হচ্ছে...</div>
+<pdocument.getElementById("products").innerText = "Firebase SDK: " + typeof firebase;
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -70,7 +67,7 @@ const firebaseConfig = {
   messagingSenderId: "249302104733",
   appId: "1:249302104733:web:a5f3b2b07aa97b0601f274",
 };
-console.log("Firebase SDK loaded:", typeof firebase);
+document.getElementById("products").innerText = "Firebase SDK: " + typeof firebase;
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
