@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZRX TOPUP</title>
+
 <style>
 body {
   margin: 0;
@@ -48,57 +48,101 @@ input {
 }
 </style>
 </head>
+
 <body>
+
 <header>ZRX TOPUP</header>
+
 <div class="container">
-<h2>Free Fire Diamond Store</h2>
-<pdocument.getElementById("products").innerText = "Firebase SDK: " + typeof firebase;
+  <h2>Free Fire Diamond Store</h2>
+  <p>তোমার পছন্দের Diamond Package বেছে নাও</p>
+
+  <input id="uid" placeholder="Free Fire Player UID">
+
+  <h3>Diamond Packages</h3>
+  <div id="products">প্যাকেজ লোড হচ্ছে...</div>
+
+  <p>এটি একটি পরীক্ষামূলক Demo Website।</p>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBPwH2ziVSVtdJnKhBu00WA3gw5LrHF56w",
-  authDomain: "zrx-topup.firebaseapp.com",
-  projectId: "zrx-topup",
-  storageBucket: "zrx-topup.firebasestorage.app",
-  messagingSenderId: "249302104733",
-  appId: "1:249302104733:web:a5f3b2b07aa97b0601f274",
-};
-document.getElementById("products").innerText = "Firebase SDK: " + typeof firebase;
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const area = document.getElementById("products");
 
-db.collection("products").get().then(snapshot => {
-  const area = document.getElementById("products");
-  area.innerHTML = "";
+if (typeof firebase === "undefined") {
+  area.innerText = "Firebase SDK লোড হয়নি।";
+} else {
 
-  snapshot.forEach(doc => {
-    const p = doc.data();
-    area.innerHTML += `
-      <div class="card">
-        <h3>${p.name || doc.id}</h3>
-        <p>৳${p.price}</p>
-        <button onclick="selectPackage('${doc.id}')">
-          Select Package
-        </button>
-      </div>
-    `;
-  });
-}).catch(error => { console.error("Firebase Error:", error);
-  document.getElementById("products").innerText =
-    "Firebase Error: " + error.code + " - " + error.message;
-});
-function selectPackage(id) {
-  const uid = document.getElementById("uid").value.trim();
-  if (!uid) {
-    alert("প্রথমে Player UID লেখো");
-    return;
+  const firebaseConfig = {
+    apiKey: "এখানে তোমার Firebase API Key বসাও",
+    authDomain: "zrx-topup.firebaseapp.com",
+    projectId: "zrx-topup",
+    storageBucket: "zrx-topup.firebasestorage.app",
+    messagingSenderId: "249302104733",
+    appId: "1:249302104733:web:a5f3b2b07aa97b0601f274"
+  };
+
+  try {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    db.collection("products").get()
+      .then(snapshot => {
+
+        area.innerHTML = "";
+
+        if (snapshot.empty) {
+          area.innerText = "কোনো Package পাওয়া যায়নি।";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const p = doc.data();
+
+          const card = document.createElement("div");
+          card.className = "card";
+
+          const name = document.createElement("h3");
+          name.textContent = p.name || doc.id;
+
+          const price = document.createElement("p");
+          price.textContent = "৳" + p.price;
+
+          const button = document.createElement("button");
+          button.textContent = "Select Package";
+
+          button.onclick = () => {
+            const uid = document.getElementById("uid").value.trim();
+
+            if (!uid) {
+              alert("প্রথমে Player UID লেখো");
+              return;
+            }
+
+            alert("Demo Package Selected: " + (p.name || doc.id));
+          };
+
+          card.appendChild(name);
+          card.appendChild(price);
+          card.appendChild(button);
+          area.appendChild(card);
+        });
+
+      })
+      .catch(error => {
+        console.error("Firebase Error:", error);
+        area.innerText =
+          "Firebase Error: " + error.code + " - " + error.message;
+      });
+
+  } catch (error) {
+    console.error(error);
+    area.innerText = "Firebase Error: " + error.message;
   }
-  alert("Package selected: " + id);
 }
 </script>
+
 </body>
 </html>
