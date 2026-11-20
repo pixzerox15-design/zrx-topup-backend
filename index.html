@@ -4,145 +4,92 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZRX TOPUP</title>
-
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #101020;
-  color: white;
-  text-align: center;
-}
-header {
-  background: #191933;
-  padding: 22px;
-  color: #a78bfa;
-  font-size: 27px;
-  font-weight: bold;
-}
-.container {
-  max-width: 500px;
-  margin: 25px auto;
-  padding: 15px;
-}
-.card {
-  background: #20203b;
-  padding: 18px;
-  margin: 12px 0;
-  border-radius: 12px;
-}
-button {
-  background: #7c3aed;
-  color: white;
-  border: 0;
-  padding: 12px 25px;
-  border-radius: 8px;
-  font-size: 16px;
-}
-input {
-  width: 90%;
-  padding: 13px;
-  margin: 10px;
-  border-radius: 8px;
-  border: 0;
-}
+body{margin:0;font-family:Arial,sans-serif;background:#101020;color:white;text-align:center}
+header{background:#191933;padding:22px;color:#a78bfa;font-size:27px;font-weight:bold}
+.container{max-width:500px;margin:25px auto;padding:15px}
+.card{background:#20203b;padding:18px;margin:12px 0;border-radius:12px}
+button{background:#7c3aed;color:white;border:0;padding:12px 25px;border-radius:8px;font-size:16px}
+input{width:90%;padding:13px;margin:10px;border-radius:8px;border:0;box-sizing:border-box}
 </style>
 </head>
-
 <body>
-
 <header>ZRX TOPUP</header>
-
 <div class="container">
-  <h2>Free Fire Diamond Store</h2>
-  <p>তোমার পছন্দের Diamond Package বেছে নাও</p>
-
-  <input id="uid" placeholder="Free Fire Player UID">
-
-  <h3>Diamond Packages</h3>
-  <div id="products">প্যাকেজ লোড হচ্ছে...</div>
-
-  <p>এটি একটি পরীক্ষামূলক Demo Website।</p>
+<h2>Free Fire Diamond Store</h2>
+<p>তোমার পছন্দের Diamond Package বেছে নাও</p>
+<input id="uid" placeholder="Free Fire Player UID">
+<h3>Diamond Packages</h3>
+<div id="products">প্যাকেজ লোড হচ্ছে...</div>
+<p>এটি একটি পরীক্ষামূলক Demo Website।</p>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-
 <script>
-const area = document.getElementById("products");
+const area=document.getElementById("products");
 
-if (typeof firebase === "undefined") {
-  area.innerText = "Firebase SDK লোড হয়নি।";
-} else {
+async function loadProducts(){
+  try{
+    if(typeof firebase==="undefined"){
+      throw new Error("Firebase SDK লোড হয়নি");
+    }
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBPwH2ziVSVtdJnKhBu00WA3gw5LrHF56w",
-    authDomain: "zrx-topup.firebaseapp.com",
-    projectId: "zrx-topup",
-    storageBucket: "zrx-topup.firebasestorage.app",
-    messagingSenderId: "249302104733",
-    appId: "1:249302104733:web:a5f3b2b07aa97b0601f274"
-  };
+    const firebaseConfig={
+      apiKey:"এখানে তোমার আগের Firebase API Key বসাও",
+      authDomain:"zrx-topup.firebaseapp.com",
+      projectId:"zrx-topup",
+      storageBucket:"zrx-topup.firebasestorage.app",
+      messagingSenderId:"249302104733",
+      appId:"1:249302104733:web:a5f3b2b07aa97b0601f274"
+    };
 
-  try {
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    if(!firebase.apps.length){
+      firebase.initializeApp(firebaseConfig);
+    }
 
-    db.collection("products").get()
-      .then(snapshot => {
+    const db=firebase.firestore();
+    const snapshot=await db.collection("products").get();
 
-        area.innerHTML = "";
+    area.innerHTML="";
 
-        if (snapshot.empty) {
-          area.innerText = "কোনো Package পাওয়া যায়নি।";
+    if(snapshot.empty){
+      area.textContent="কোনো Package পাওয়া যায়নি।";
+      return;
+    }
+
+    snapshot.forEach(doc=>{
+      const p=doc.data();
+      const card=document.createElement("div");
+      card.className="card";
+
+      const name=document.createElement("h3");
+      name.textContent=p.name||doc.id;
+
+      const price=document.createElement("p");
+      price.textContent="৳"+(p.price??"দাম নেই");
+
+      const button=document.createElement("button");
+      button.textContent="Select Package";
+      button.onclick=()=>{
+        const uid=document.getElementById("uid").value.trim();
+        if(!uid){
+          alert("প্রথমে Player UID লেখো");
           return;
         }
+        alert("Demo Package Selected: "+(p.name||doc.id));
+      };
 
-        snapshot.forEach(doc => {
-          const p = doc.data();
-
-          const card = document.createElement("div");
-          card.className = "card";
-
-          const name = document.createElement("h3");
-          name.textContent = p.name || doc.id;
-
-          const price = document.createElement("p");
-          price.textContent = "৳" + p.price;
-
-          const button = document.createElement("button");
-          button.textContent = "Select Package";
-
-          button.onclick = () => {
-            const uid = document.getElementById("uid").value.trim();
-
-            if (!uid) {
-              alert("প্রথমে Player UID লেখো");
-              return;
-            }
-
-            alert("Demo Package Selected: " + (p.name || doc.id));
-          };
-
-          card.appendChild(name);
-          card.appendChild(price);
-          card.appendChild(button);
-          area.appendChild(card);
-        });
-
-      })
-      .catch(error => {
-        console.error("Firebase Error:", error);
-        area.innerText =
-          "Firebase Error: " + error.code + " - " + error.message;
-      });
-
-  } catch (error) {
-    console.error(error);
-    area.innerText = "Firebase Error: " + error.message;
+      card.append(name,price,button);
+      area.appendChild(card);
+    });
+  }catch(error){
+    console.error("Firebase Error:",error);
+    area.textContent="Firebase Error: "+(error.code||"")+" - "+error.message;
   }
 }
-</script>
 
+loadProducts();
+</script>
 </body>
 </html>
