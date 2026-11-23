@@ -1,101 +1,284 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZRX TOPUP</title>
+<title>ZRX SHOP - Free Fire Diamond</title>
+
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#101020;color:white;text-align:center}
-header{background:#191933;padding:22px;color:#a78bfa;font-size:27px;font-weight:bold}
-.container{max-width:500px;margin:25px auto;padding:15px}
-.card{background:#20203b;padding:18px;margin:12px 0;border-radius:12px}
-button{background:#7c3aed;color:white;border:0;padding:12px 25px;border-radius:8px;font-size:16px}
-input{width:90%;padding:13px;margin:10px;border-radius:8px;border:0;box-sizing:border-box}
-</style>
-</head>
-<body>
-<header>ZRX TOPUP</header>
-<div class="container">
-<h2>Free Fire Diamond Store</h2>
-<p>তোমার পছন্দের Diamond Package বেছে নাও</p>
-<input id="uid" placeholder="Free Fire Player UID">
-<h3>Diamond Packages</h3>
-<div id="products">প্যাকেজ লোড হচ্ছে...</div>
-<p>এটি একটি পরীক্ষামূলক Demo Website।</p>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script>
-const area=document.getElementById("products");
-area.textContent="Firebase সংযোগ পরীক্ষা হচ্ছে...";
-async function loadProducts(){
-  try{
-    if(typeof firebase==="undefined"){
-      throw new Error("Firebase SDK লোড হয়নি");
-    }
-
-    const firebaseConfig={
-      apiKey:"AIzaSyBPwH2ziVSVtdJnKhBu00WA3gw5LrHF56w",
-      authDomain:"zrx-topup.firebaseapp.com",
-      projectId:"zrx-topup",
-      storageBucket:"zrx-topup.firebasestorage.app",
-      messagingSenderId:"249302104733",
-      appId:"1:249302104733:web:a5f3b2b07aa97b0601f274"
-    };
-
-    if(!firebase.apps.length){
-      firebase.initializeApp(firebaseConfig);
-    }
-
-    const db=firebase.firestore();
-    area.textContent="Firebase চালু হয়েছে!";
-    const snapshot = await Promise.race([
-  db.collection("products").get(),
-  new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Firestore Timeout")), 15000)
-  )
-]);
-area.textContent="Firestore থেকে ডেটা পাওয়া গেছে!";
-    area.innerHTML="";
-
-    if(snapshot.empty){
-      area.textContent="কোনো Package পাওয়া যায়নি।";
-      return;
-    }
-
-    snapshot.forEach(doc=>{
-      const p=doc.data();
-      const card=document.createElement("div");
-      card.className="card";
-
-      const name=document.createElement("h3");
-      name.textContent=p.name||doc.id;
-
-      const price=document.createElement("p");
-      price.textContent="৳"+(p.price??"দাম নেই");
-
-      const button=document.createElement("button");
-      button.textContent="Select Package";
-      button.onclick=()=>{
-        const uid=document.getElementById("uid").value.trim();
-        if(!uid){
-          alert("প্রথমে Player UID লেখো");
-          return;
-        }
-        alert("Demo Package Selected: "+(p.name||doc.id));
-      };
-
-      card.append(name,price,button);
-      area.appendChild(card);
-    });
-  }catch(error){
-    console.error("Firebase Error:",error);
-    area.textContent="Firebase Error: "+(error.code||"")+" - "+error.message;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-loadProducts();
+body {
+  font-family: Arial, sans-serif;
+  background: #090914;
+  color: white;
+  padding: 16px;
+}
+
+.container {
+  max-width: 480px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  padding: 25px 10px;
+}
+
+.logo {
+  color: #a855f7;
+  font-size: 34px;
+  font-weight: bold;
+}
+
+header p {
+  color: #bbb;
+  margin-top: 8px;
+}
+
+h2 {
+  margin: 20px 0 14px;
+  color: #c084fc;
+}
+
+.packages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.package {
+  background: #17172a;
+  border: 1px solid #6535a0;
+  border-radius: 12px;
+  padding: 18px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.package:hover,
+.package.selected {
+  background: #38205b;
+  border: 2px solid #c084fc;
+}
+
+.package strong {
+  display: block;
+  font-size: 20px;
+  color: #fff;
+}
+
+.package span {
+  display: block;
+  margin-top: 7px;
+  color: #c084fc;
+}
+
+.form-box {
+  background: #17172a;
+  padding: 18px;
+  border-radius: 14px;
+  margin-top: 22px;
+}
+
+label {
+  display: block;
+  margin: 14px 0 7px;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #090914;
+  color: white;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 18px;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #7e22ce, #a855f7);
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#result {
+  display: none;
+  background: #20203a;
+  border: 1px solid #a855f7;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 18px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.notice {
+  margin-top: 20px;
+  padding: 12px;
+  background: #30220d;
+  color: #ffd27a;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  color: #888;
+  margin: 25px 0 10px;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="logo">ZRX SHOP</div>
+  <p>Free Fire Diamond Store</p>
+  <p>তোমার পছন্দের Diamond Package বেছে নাও</p>
+</header>
+
+<h2>💎 Diamond Packages</h2>
+
+<div class="packages">
+  <div class="package" onclick="selectPackage(100,this)">
+    <strong>100 💎</strong>
+    <span>দাম শিগগিরই</span>
+  </div>
+
+  <div class="package" onclick="selectPackage(200,this)">
+    <strong>200 💎</strong>
+    <span>দাম শিগগিরই</span>
+  </div>
+
+  <div class="package" onclick="selectPackage(310,this)">
+    <strong>310 💎</strong>
+    <span>দাম শিগগিরই</span>
+  </div>
+
+  <div class="package" onclick="selectPackage(520,this)">
+    <strong>520 💎</strong>
+    <span>দাম শিগগিরই</span>
+  </div>
+
+  <div class="package" onclick="selectPackage(1060,this)">
+    <strong>1060 💎</strong>
+    <span>দাম শিগগিরই</span>
+  </div>
+
+  <div class="package" onclick="selectPackage(2180,this)">
+    <strong>2180 💎</strong>
+    <span>দাম শিগগিরই</span>
+  </div>
+</div>
+
+<div class="form-box">
+  <h2>🛒 Demo Order</h2>
+
+  <label>Free Fire Player UID</label>
+  <input id="uid" type="text" placeholder="তোমার Player UID লিখো">
+
+  <label>Player Name (ঐচ্ছিক)</label>
+  <input id="playerName" type="text" placeholder="Player Name">
+
+  <label>Selected Package</label>
+  <input id="selected" type="text"
+         placeholder="আগে একটি Package বেছে নাও" readonly>
+
+  <button onclick="placeOrder()">ডেমো অর্ডার তৈরি করো</button>
+
+  <div id="result"></div>
+</div>
+
+<div class="notice">
+  ⚠️ এটি একটি পরীক্ষামূলক Demo Website।
+  এখানে কোনো আসল Payment বা Diamond Delivery হয় না।
+  কোনো টাকা পাঠাবে না।
+</div>
+
+<footer>
+  © 2026 ZRX SHOP | All Rights Reserved
+</footer>
+
+</div>
+
+<script>
+let selectedPackage = 0;
+
+function selectPackage(amount, element) {
+  selectedPackage = amount;
+
+  document.querySelectorAll(".package").forEach(function(item) {
+    item.classList.remove("selected");
+  });
+
+  element.classList.add("selected");
+
+  document.getElementById("selected").value =
+    amount + " Diamonds";
+}
+
+function placeOrder() {
+  const uid = document.getElementById("uid").value.trim();
+  const playerName =
+    document.getElementById("playerName").value.trim();
+
+  if (!selectedPackage) {
+    alert("আগে একটি Diamond Package বেছে নাও!");
+    return;
+  }
+
+  if (!uid) {
+    alert("Player UID লিখো!");
+    return;
+  }
+
+  const orderId = "ZRX" + Date.now().toString().slice(-8);
+
+  const result = document.getElementById("result");
+
+  result.style.display = "block";
+
+  result.innerHTML =
+    "<h3>✅ Demo Order তৈরি হয়েছে</h3>" +
+    "<p>Order ID: " + orderId + "</p>" +
+    "<p>Player UID: " + escapeHTML(uid) + "</p>" +
+    "<p>Player Name: " + escapeHTML(playerName || "দেওয়া হয়নি") + "</p>" +
+    "<p>Package: " + selectedPackage + " Diamonds</p>" +
+    "<p>Payment: Demo Only</p>" +
+    "<p>Status: Demo Order</p>" +
+    "<p>এটি আসল অর্ডার নয়। কোনো Diamond পাঠানো হবে না।";
+}
+
+function escapeHTML(value) {
+  return value.replace(/[&<>"']/g, function(char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
+}
 </script>
+
 </body>
 </html>
