@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZRX SHOP - Admin Panel</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:18px;background:#090914;color:white;font-family:Arial,sans-serif}
+.container{max-width:850px;margin:auto}
+h1{color:#c084fc;text-align:center}
+.card{background:#17172a;border:1px solid #39304f;border-radius:12px;padding:18px;margin:15px 0}
+input{width:100%;padding:13px;margin:8px 0;background:#090914;color:white;border:1px solid #555;border-radius:8px}
+button{padding:12px 18px;background:#9333ea;color:white;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+.logout{background:#b42318}
+.message{margin-top:12px;color:#fbbf24}
+.order{border-bottom:1px solid #444;padding:14px 0;overflow-wrap:anywhere}
+.order:last-child{border:0}
+.muted{color:#aaa;font-size:13px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>ZRX SHOP</h1>
+<p style="text-align:center">Admin Order Panel — Demo Only</p>
+
+<section id="login" class="card">
+<h3>Admin Login</h3>
+<input id="password" type="password" placeholder="Admin Password" autocomplete="current-password">
+<button id="loginBtn" onclick="login()">Login</button>
+<p id="loginMessage" class="message"></p>
+</section>
+
+<section id="dashboard" class="hidden">
+<div class="card">
+<h3>ডেমো অর্ডার তালিকা</h3>
+<button onclick="loadOrders()">Refresh Orders</button>
+<button class="logout" onclick="logout()">Logout</button>
+<p id="status" class="message"></p>
+<div id="orders"></div>
+</div>
+</section>
+</div>
+
+<script>
+async function login(){
+ const password=document.getElementById("password").value;
+ const message=document.getElementById("loginMessage");
+ const button=document.getElementById("loginBtn");
+
+ if(!password){message.textContent="পাসওয়ার্ড লিখুন";return;}
+
+ button.disabled=true;
+ message.textContent="লগইন হচ্ছে...";
+
+ try{
+  const response=await fetch("/api/admin/login",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   credentials:"same-origin",
+   body:JSON.stringify({password})
+  });
+  const data=await response.json();
+
+  if(!response.ok||!data.success){
+   message.textContent=data.message||"লগইন ব্যর্থ";
+   return;
+  }
+
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("password").value="";
+  await loadOrders();
+ }catch(error){
+  message.textContent="সার্ভারের সঙ্গে সংযোগ হয়নি";
+ }finally{
+  button.disabled=false;
+ }
+}
+
+async function loadOrders(){
+ const status=document.getElementById("status");
+ const area=document.getElementById("orders");
+ status.textContent="অর্ডার লোড হচ্ছে...";
+ area.replaceChildren();
+
+ try{
+  const response=await fetch("/api/admin/orders",{
+   credentials:"same-origin",
+   cache:"no-store"
+  });
+  const data=await response.json();
+
+  if(response.status===401){
+   logout();
+   status.textContent="আবার লগইন করুন";
+   return;
+  }
+
+  if(!response.ok||!data.success){
+   status.textContent=data.message||"অর্ডার লোড হয়নি";
+   return;
+  }
+
+  const orders=Array.isArray(data.orders)?data.orders:[];
+  status.textContent="মোট Demo Order: "+orders.length;
+
+  if(!orders.length){
+   area.textContent="এখনো কোনো অর্ডার নেই";
+   return;
+  }
+
+  orders.forEach(order=>{
+   const item=document.createElement("div");
+   item.className="order";
+
+   const title=document.createElement("strong");
+   title.textContent="#"+order.id+" — "+(order.package_name||"Package");
+
+   const details=document.createElement("p");
+   details.textContent="Player UID: "+order.player_uid+
+    " | দাম: ৳"+order.package_price;
+
+   const name=document.createElement("p");
+   name.textContent="Player Name: "+(order.player_name||"দেওয়া হয়নি");
+
+   const date=document.createElement("p");
+   date.className="muted";
+   date.textContent="সময়: "+(order.created_at||"অজানা")+
+    " | Status: "+(order.status||"demo");
+
+   item.append(title,details,name,date);
+   area.appendChild(item);
+  });
+ }catch(error){
+  status.textContent="অর্ডার লোড করতে সমস্যা হয়েছে";
+ }
+}
+
+async function logout(){
+ try{
+  await fetch("/api/admin/logout",{
+   method:"POST",
+   credentials:"same-origin"
+  });
+ }catch(error){}
+
+ document.getElementById("dashboard").classList.add("hidden");
+ document.getElementById("login").classList.remove("hidden");
+ document.getElementById("password").value="";
+ document.getElementById("loginMessage").textContent="লগআউট হয়েছে";
+ document.getElementById("orders").replaceChildren();
+}
+</script>
+</body>
+</html>
