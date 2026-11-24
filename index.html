@@ -1,3 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZRX SHOP - Free Fire Diamond</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #090914;
+  color: white;
+  padding: 16px;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.logo {
+  font-size: 32px;
+  font-weight: bold;
+  color: #c084fc;
+  letter-spacing: 2px;
+}
+
 header p {
   color: #bbb;
   margin-top: 8px;
@@ -77,6 +116,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 #result {
   display: none;
   background: #20203a;
@@ -120,6 +164,7 @@ footer {
 <h2>💎 Diamond Packages</h2>
 
 <div class="packages">
+
   <div class="package" onclick="selectPackage(100,this)">
     <strong>100 💎</strong>
     <span>৳80</span>
@@ -149,24 +194,43 @@ footer {
     <strong>2180 💎</strong>
     <span>৳1450</span>
   </div>
+
 </div>
 
 <div class="form-box">
+
   <h2>🛒 Demo Order</h2>
 
   <label>Free Fire Player UID</label>
-  <input id="uid" type="text" placeholder="তোমার Player UID লিখো">
+  <input
+    id="uid"
+    type="text"
+    inputmode="numeric"
+    placeholder="তোমার Player UID লিখো"
+  >
 
   <label>Player Name (ঐচ্ছিক)</label>
-  <input id="playerName" type="text" placeholder="Player Name">
+  <input
+    id="playerName"
+    type="text"
+    maxlength="50"
+    placeholder="Player Name"
+  >
 
   <label>Selected Package</label>
-  <input id="selected" type="text"
-         placeholder="আগে একটি Package বেছে নাও" readonly>
+  <input
+    id="selected"
+    type="text"
+    placeholder="আগে একটি Package বেছে নাও"
+    readonly
+  >
 
-  <button onclick="placeOrder()">ডেমো অর্ডার তৈরি করো</button>
+  <button id="orderButton" onclick="placeOrder()">
+    ডেমো অর্ডার তৈরি করো
+  </button>
 
   <div id="result"></div>
+
 </div>
 
 <div class="notice">
@@ -197,48 +261,71 @@ function selectPackage(amount, element) {
     amount + " Diamonds";
 }
 
-function placeOrder() {
+async function placeOrder() {
+
   const uid = document.getElementById("uid").value.trim();
+
   const playerName =
     document.getElementById("playerName").value.trim();
+
+  const result = document.getElementById("result");
+
+  const button = document.getElementById("orderButton");
 
   if (!selectedPackage) {
     alert("আগে একটি Diamond Package বেছে নাও!");
     return;
   }
 
-  if (!uid) {
-    alert("Player UID লিখো!");
+  if (!/^\d{5,20}$/.test(uid)) {
+    alert("সঠিক Player UID লিখো!");
     return;
   }
 
-  const orderId = "ZRX" + Date.now().toString().slice(-8);
-
-  const result = document.getElementById("result");
+  button.disabled = true;
+  button.textContent = "অর্ডার পাঠানো হচ্ছে...";
 
   result.style.display = "block";
+  result.textContent = "ডেমো অর্ডার সংরক্ষণ করা হচ্ছে...";
 
-  result.innerHTML =
-    "<h3>✅ Demo Order তৈরি হয়েছে</h3>" +
-    "<p>Order ID: " + orderId + "</p>" +
-    "<p>Player UID: " + escapeHTML(uid) + "</p>" +
-    "<p>Player Name: " + escapeHTML(playerName || "দেওয়া হয়নি") + "</p>" +
-    "<p>Package: " + selectedPackage + " Diamonds</p>" +
-    "<p>Payment: Demo Only</p>" +
-    "<p>Status: Demo Order</p>" +
-    "<p>এটি আসল অর্ডার নয়। কোনো Diamond পাঠানো হবে না।";
-}
+  try {
 
-function escapeHTML(value) {
-  return value.replace(/[&<>"']/g, function(char) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[char];
-  });
+    const response = await fetch("/api/orders", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        uid: uid,
+        name: playerName,
+        amount: String(selectedPackage)
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "অর্ডার সংরক্ষণ হয়নি");
+    }
+
+    result.textContent =
+      "✅ Demo Order ডেটাবেজে সংরক্ষিত হয়েছে। " +
+      "এটি আসল Payment বা Diamond Delivery নয়।";
+
+  } catch (error) {
+
+    result.textContent =
+      "❌ অর্ডার সংরক্ষণ হয়নি। " +
+      "সার্ভার বা ডেটাবেজ সংযোগ পরীক্ষা করতে হবে।";
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = "ডেমো অর্ডার তৈরি করো";
+
+  }
 }
 </script>
 
