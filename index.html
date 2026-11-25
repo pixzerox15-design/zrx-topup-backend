@@ -172,6 +172,25 @@ input[readonly] {
   background: #1b1028;
 }
 
+#lookupStatus {
+  margin-top: 9px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #c4a5fd;
+}
+
+#lookupStatus.success {
+  color: #86efac;
+}
+
+#lookupStatus.error {
+  color: #fca5a5;
+}
+
+#lookupStatus.loading {
+  color: #f0abfc;
+}
+
 button.order-btn {
   width: 100%;
   padding: 15px;
@@ -315,16 +334,22 @@ footer {
     id="uid"
     type="text"
     inputmode="numeric"
-    maxlength="20"
+    maxlength="15"
+    autocomplete="off"
     placeholder="তোমার Player UID লিখো"
   >
 
-  <label>Player Name (ঐচ্ছিক)</label>
+  <div id="lookupStatus" aria-live="polite">
+    UID লিখলে Player Name খোঁজা হবে।
+  </div>
+
+  <label>Player Name</label>
   <input
     id="playerName"
     type="text"
     maxlength="50"
-    placeholder="Player Name"
+    placeholder="Player Name এখানে দেখাবে"
+    readonly
   >
 
   <label>Selected Package</label>
@@ -343,7 +368,7 @@ footer {
     ডেমো অর্ডার তৈরি করো
   </button>
 
-  <div id="result"></div>
+  <div id="result" aria-live="polite"></div>
 
 </div>
 
@@ -363,6 +388,19 @@ footer {
 let selectedPackage = 0;
 let selectedPrice = 0;
 
+let lookupTimer = null;
+let lookupController = null;
+let lookupNumber = 0;
+
+const uidInput = document.getElementById("uid");
+const playerNameInput = document.getElementById("playerName");
+const lookupStatus = document.getElementById("lookupStatus");
+
+function setLookupStatus(message, type = "") {
+  lookupStatus.textContent = message;
+  lookupStatus.className = type;
+}
+
 function selectPackage(amount, price, element) {
   selectedPackage = amount;
   selectedPrice = price;
@@ -377,11 +415,95 @@ function selectPackage(amount, price, element) {
     amount + " Diamonds — ৳" + price;
 }
 
-async function placeOrder() {
+// UID পরিবর্তন হলে আগের ফলাফল বাতিল করে নতুন Lookup
+uidInput.addEventListener("input", function() {
+  clearTimeout(lookupTimer);
 
-  const uid = document.getElementById("uid").value.trim();
-  const playerName =
-    document.getElementById("playerName").value.trim();
+  lookupNumber++;
+
+  if (lookupController) {
+    lookupController.abort();
+    lookupController = null;
+  }
+
+  playerNameInput.value = "";
+
+  const uid = uidInput.value.trim();
+
+  if (!/^\d{5,15}$/.test(uid)) {
+    setLookupStatus(
+      uid.length === 0
+        ? "UID লিখলে Player Name খোঁজা হবে।"
+        : "৫ থেকে ১৫ সংখ্যার সঠিক UID লিখুন।"
+    );
+    return;
+  }
+
+  setLookupStatus("Player Name খোঁজা হচ্ছে...", "loading");
+
+  const currentLookup = lookupNumber;
+
+  lookupTimer = setTimeout(function() {
+    lookupPlayer(uid, currentLookup);
+  }, 700);
+});
+
+async function lookupPlayer(uid, currentLookup) {
+  lookupController = new AbortController();
+
+  try {
+    const response = await fetch(
+      "/api/player?uid=" + encodeURIComponent(uid),
+      {
+        method: "GET",
+        cache: "no-store",
+        signal: lookupController.signal
+      }
+    );
+
+    const data = await response.json();
+
+    if (currentLookup !== lookupNumber) return;
+
+    if (!response.ok || !data.success || !data.nickname) {
+      throw new Error(
+        data.message || "Player Name পাওয়া যায়নি।"
+      );
+    }
+
+    playerNameInput.value = data.nickname;
+
+    setLookupStatus(
+      data.cached
+        ? "✅ Player Name ডেটাবেজ থেকে পাওয়া গেছে।"
+        : "✅ Player Name পাওয়া গেছে এবং ডেটাবেজে সংরক্ষিত হয়েছে।",
+      "success"
+    );
+
+  } catch (error) {
+    if (error.name === "AbortError") return;
+
+    if (currentLookup !== lookupNumber) return;
+
+    playerNameInput.value = "";
+
+    setLookupStatus(
+      error.message === "Failed to fetch"
+        ? "সার্ভারের সঙ্গে সংযোগ করা যাচ্ছে না।"
+        : error.message || "Player Name পাওয়া যায়নি।",
+      "error"
+    );
+
+  } finally {
+    if (currentLookup === lookupNumber) {
+      lookupController = null;
+    }
+  }
+}
+
+async function placeOrder() {
+  const uid = uidInput.value.trim();
+  const playerName = playerNameInput.value.trim();
 
   const result = document.getElementById("result");
   const button = document.getElementById("orderButton");
@@ -391,7 +513,7 @@ async function placeOrder() {
     return;
   }
 
-  if (!/^\d{5,20}$/.test(uid)) {
+  if (!/^\d{5,15}$/.test(uid)) {
     alert("সঠিক Demo Player UID লিখো!");
     return;
   }
@@ -403,7 +525,6 @@ async function placeOrder() {
   result.textContent = "ডেমো অর্ডার সংরক্ষণ করা হচ্ছে...";
 
   try {
-
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: {
@@ -424,18 +545,18 @@ async function placeOrder() {
 
     result.textContent =
       "✅ Demo Order ডেটাবেজে সংরক্ষিত হয়েছে। " +
+      (playerName
+        ? "Player Name: " + playerName + "। "
+        : "Player Name এখনো পাওয়া যায়নি। ") +
       "এটি আসল Payment বা Diamond Delivery নয়।";
 
   } catch (error) {
-
     result.textContent =
       "❌ অর্ডার সংরক্ষণ হয়নি। সার্ভার বা ডেটাবেজ সংযোগ পরীক্ষা করতে হবে।";
 
   } finally {
-
     button.disabled = false;
     button.textContent = "ডেমো অর্ডার তৈরি করো";
-
   }
 }
 </script>
