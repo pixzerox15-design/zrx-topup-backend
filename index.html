@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZRX SHOP - Free Fire Diamond</title>
+<title>ZRX SHOP - Purple Neon</title>
 
 <style>
 * {
@@ -13,141 +13,232 @@
   padding: 0;
 }
 
+:root {
+  --purple: #a855f7;
+  --light: #d8b4fe;
+  --pink: #e879f9;
+  --bg: #080510;
+  --card: #160d25;
+}
+
 body {
   font-family: Arial, sans-serif;
-  background: #090914;
-  color: white;
+  background:
+    radial-gradient(ellipse at top, #321052 0%, transparent 48%),
+    var(--bg);
+  color: #fff;
   padding: 16px;
+  min-height: 100vh;
 }
 
 .container {
-  max-width: 500px;
+  max-width: 560px;
   margin: auto;
 }
 
 header {
   text-align: center;
-  padding: 20px 0;
+  padding: 28px 10px 25px;
+  border-bottom: 1px solid #512477;
 }
 
 .logo {
-  font-size: 32px;
-  font-weight: bold;
-  color: #c084fc;
-  letter-spacing: 2px;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--light);
+  text-shadow: 0 0 10px #a855f7, 0 0 25px #9333ea;
 }
 
-header p {
-  color: #bbb;
+.tagline {
+  color: #ddd0ed;
+  margin-top: 12px;
+  font-size: 15px;
+}
+
+.subtag {
+  color: #b78ad8;
   margin-top: 8px;
+  font-size: 13px;
 }
 
-h2 {
-  margin: 20px 0 14px;
-  color: #c084fc;
+.section-title {
+  color: var(--light);
+  text-align: center;
+  margin: 27px 0 18px;
+  font-size: 21px;
+  text-shadow: 0 0 12px #9333ea;
 }
 
 .packages {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 13px;
 }
 
 .package {
-  background: #17172a;
-  border: 1px solid #6535a0;
-  border-radius: 12px;
-  padding: 18px 8px;
+  width: 100%;
+  background: linear-gradient(145deg, #241137, #10091b);
+  border: 1px solid #7135a5;
+  border-radius: 14px;
+  padding: 19px 8px;
   text-align: center;
+  color: white;
   cursor: pointer;
-  transition: 0.2s;
+  transition: .2s;
+  box-shadow: 0 0 10px #7e22ce22;
 }
 
 .package:hover,
 .package.selected {
-  background: #38205b;
-  border: 2px solid #c084fc;
+  border: 2px solid #d8b4fe;
+  background: linear-gradient(145deg, #55217c, #261039);
+  box-shadow: 0 0 12px #a855f7, 0 0 25px #9333ea55;
+  transform: translateY(-2px);
+}
+
+.diamond {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 9px;
+  filter: drop-shadow(0 0 7px #38bdf8);
 }
 
 .package strong {
   display: block;
-  font-size: 20px;
-  color: #fff;
+  font-size: 21px;
 }
 
 .package span {
   display: block;
+  margin-top: 8px;
+  color: #e9a8ff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.package small {
+  display: block;
+  color: #bda8d0;
   margin-top: 7px;
-  color: #c084fc;
+  font-size: 11px;
 }
 
 .form-box {
-  background: #17172a;
-  padding: 18px;
-  border-radius: 14px;
-  margin-top: 22px;
+  background: linear-gradient(145deg, #21112f, #11091c);
+  border: 1px solid #8139b7;
+  border-radius: 17px;
+  padding: 20px;
+  margin-top: 27px;
+  box-shadow: 0 0 18px #9333ea33;
+}
+
+.form-box h2 {
+  color: var(--light);
+  text-align: center;
+  font-size: 21px;
+  margin-bottom: 17px;
 }
 
 label {
   display: block;
-  margin: 14px 0 7px;
+  margin: 15px 0 7px;
+  color: #e7d4f7;
+  font-size: 14px;
 }
 
 input {
   width: 100%;
-  padding: 13px;
-  border: 1px solid #555;
-  border-radius: 8px;
-  background: #090914;
+  padding: 14px;
+  border: 1px solid #71439a;
+  border-radius: 9px;
+  background: #0c0713;
   color: white;
   font-size: 16px;
+  outline: none;
 }
 
-button {
+input:focus {
+  border-color: #d8b4fe;
+  box-shadow: 0 0 10px #a855f766;
+}
+
+input::placeholder {
+  color: #89799b;
+}
+
+input[readonly] {
+  color: #e9b5ff;
+  background: #1b1028;
+}
+
+button.order-btn {
   width: 100%;
-  padding: 14px;
-  margin-top: 18px;
-  border: none;
-  border-radius: 9px;
-  background: linear-gradient(90deg, #7e22ce, #a855f7);
+  padding: 15px;
+  margin-top: 20px;
+  border: 1px solid #d8b4fe;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #7e22ce, #a855f7, #c026d3);
   color: white;
   font-size: 17px;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 0 0 15px #9333ea66;
+  transition: .2s;
+}
+
+button.order-btn:hover {
+  box-shadow: 0 0 22px #c084fc;
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: .6;
   cursor: not-allowed;
 }
 
 #result {
   display: none;
-  background: #20203a;
+  background: #1b1028;
   border: 1px solid #a855f7;
-  padding: 15px;
+  padding: 14px;
   border-radius: 10px;
-  margin-top: 18px;
-  line-height: 1.8;
+  margin-top: 17px;
+  line-height: 1.7;
   overflow-wrap: anywhere;
+  font-size: 14px;
 }
 
 .notice {
-  margin-top: 20px;
-  padding: 12px;
-  background: #30220d;
-  color: #ffd27a;
-  border-radius: 8px;
+  margin-top: 22px;
+  padding: 14px;
+  background: #30200e;
+  border: 1px solid #a66b23;
+  color: #ffd58a;
+  border-radius: 10px;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.7;
   text-align: center;
 }
 
 footer {
   text-align: center;
-  color: #888;
-  margin: 25px 0 10px;
-  font-size: 13px;
+  color: #927fa4;
+  margin: 27px 0 12px;
+  font-size: 12px;
+}
+
+@media (max-width: 360px) {
+  .logo {
+    font-size: 31px;
+  }
+
+  .package {
+    padding: 15px 5px;
+  }
+
+  .package strong {
+    font-size: 18px;
+  }
 }
 </style>
 </head>
@@ -157,43 +248,61 @@ footer {
 
 <header>
   <div class="logo">ZRX SHOP</div>
-  <p>Free Fire Diamond Store</p>
-  <p>তোমার পছন্দের Diamond Package বেছে নাও</p>
+  <p class="tagline">Free Fire Diamond Store</p>
+  <p class="subtag">তোমার পছন্দের Diamond Package বেছে নাও</p>
 </header>
 
-<h2>💎 Diamond Packages</h2>
+<h2 class="section-title">💎 Diamond Packages 💎</h2>
 
 <div class="packages">
 
-  <div class="package" onclick="selectPackage(100,this)">
-    <strong>100 💎</strong>
+  <button type="button" class="package"
+    onclick="selectPackage(100,80,this)">
+    <span class="diamond">💎</span>
+    <strong>100 Diamonds</strong>
     <span>৳80</span>
-  </div>
+    <small>ডেমো প্যাকেজ</small>
+  </button>
 
-  <div class="package" onclick="selectPackage(200,this)">
-    <strong>200 💎</strong>
+  <button type="button" class="package"
+    onclick="selectPackage(200,150,this)">
+    <span class="diamond">💎</span>
+    <strong>200 Diamonds</strong>
     <span>৳150</span>
-  </div>
+    <small>ডেমো প্যাকেজ</small>
+  </button>
 
-  <div class="package" onclick="selectPackage(310,this)">
-    <strong>310 💎</strong>
+  <button type="button" class="package"
+    onclick="selectPackage(310,240,this)">
+    <span class="diamond">💎</span>
+    <strong>310 Diamonds</strong>
     <span>৳240</span>
-  </div>
+    <small>ডেমো প্যাকেজ</small>
+  </button>
 
-  <div class="package" onclick="selectPackage(520,this)">
-    <strong>520 💎</strong>
+  <button type="button" class="package"
+    onclick="selectPackage(520,350,this)">
+    <span class="diamond">💎</span>
+    <strong>520 Diamonds</strong>
     <span>৳350</span>
-  </div>
+    <small>ডেমো প্যাকেজ</small>
+  </button>
 
-  <div class="package" onclick="selectPackage(1060,this)">
-    <strong>1060 💎</strong>
+  <button type="button" class="package"
+    onclick="selectPackage(1060,720,this)">
+    <span class="diamond">💎</span>
+    <strong>1060 Diamonds</strong>
     <span>৳720</span>
-  </div>
+    <small>ডেমো প্যাকেজ</small>
+  </button>
 
-  <div class="package" onclick="selectPackage(2180,this)">
-    <strong>2180 💎</strong>
+  <button type="button" class="package"
+    onclick="selectPackage(2180,1450,this)">
+    <span class="diamond">💎</span>
+    <strong>2180 Diamonds</strong>
     <span>৳1450</span>
-  </div>
+    <small>ডেমো প্যাকেজ</small>
+  </button>
 
 </div>
 
@@ -206,6 +315,7 @@ footer {
     id="uid"
     type="text"
     inputmode="numeric"
+    maxlength="20"
     placeholder="তোমার Player UID লিখো"
   >
 
@@ -225,7 +335,11 @@ footer {
     readonly
   >
 
-  <button id="orderButton" onclick="placeOrder()">
+  <button
+    type="button"
+    class="order-btn"
+    id="orderButton"
+    onclick="placeOrder()">
     ডেমো অর্ডার তৈরি করো
   </button>
 
@@ -247,9 +361,11 @@ footer {
 
 <script>
 let selectedPackage = 0;
+let selectedPrice = 0;
 
-function selectPackage(amount, element) {
+function selectPackage(amount, price, element) {
   selectedPackage = amount;
+  selectedPrice = price;
 
   document.querySelectorAll(".package").forEach(function(item) {
     item.classList.remove("selected");
@@ -258,18 +374,16 @@ function selectPackage(amount, element) {
   element.classList.add("selected");
 
   document.getElementById("selected").value =
-    amount + " Diamonds";
+    amount + " Diamonds — ৳" + price;
 }
 
 async function placeOrder() {
 
   const uid = document.getElementById("uid").value.trim();
-
   const playerName =
     document.getElementById("playerName").value.trim();
 
   const result = document.getElementById("result");
-
   const button = document.getElementById("orderButton");
 
   if (!selectedPackage) {
@@ -278,7 +392,7 @@ async function placeOrder() {
   }
 
   if (!/^\d{5,20}$/.test(uid)) {
-    alert("সঠিক Player UID লিখো!");
+    alert("সঠিক Demo Player UID লিখো!");
     return;
   }
 
@@ -292,11 +406,9 @@ async function placeOrder() {
 
     const response = await fetch("/api/orders", {
       method: "POST",
-
       headers: {
         "Content-Type": "application/json"
       },
-
       body: JSON.stringify({
         uid: uid,
         name: playerName,
@@ -317,8 +429,7 @@ async function placeOrder() {
   } catch (error) {
 
     result.textContent =
-      "❌ অর্ডার সংরক্ষণ হয়নি। " +
-      "সার্ভার বা ডেটাবেজ সংযোগ পরীক্ষা করতে হবে।";
+      "❌ অর্ডার সংরক্ষণ হয়নি। সার্ভার বা ডেটাবেজ সংযোগ পরীক্ষা করতে হবে।";
 
   } finally {
 
